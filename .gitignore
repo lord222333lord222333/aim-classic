@@ -1,0 +1,19 @@
+# Personal user data, chat history & API keys (DO NOT publish)
+aim_data.json
+AIMClassic_v2.exe
+
+# Android APK temporary build output & debug keystore
+android_apk/_build/
+android_apk/debug.keystore
+*.idsig
+
+# Flutter local build artifacts
+mobile_native/.dart_tool/
+mobile_native/build/
+mobile_native/.packages
+
+# OS & editor temp files
+*.tmp
+*.bak
+Thumbs.db
+.DS_Store

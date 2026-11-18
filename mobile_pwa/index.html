@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>AIM Classic 6.0 Mobile</title>
+  <meta name="theme-color" content="#0b88c8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AIM Classic" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="theme-aero aero-wallpaper">
+  <div id="app" class="app-shell">
+    <!-- Glossy Top Window Bar -->
+    <header class="xp-titlebar">
+      <div class="tb-left">
+        <img src="./icons/icon-192.png" alt="AIM" class="tb-logo" />
+        <div style="min-width:0">
+          <div class="tb-title" id="hdr-title">AIM Classic 6.0 Mobile</div>
+          <div class="tb-sub" id="hdr-sub">Global Cloud + AI Ready</div>
+        </div>
+      </div>
+      <div class="tb-right">
+        <button id="btn-mute-hdr" class="xp-pill-btn ghost" type="button" title="Mute / Unmute">🔊</button>
+        <button id="btn-install-banner" class="xp-pill-btn hidden" type="button">Install</button>
+        <span id="cloud-dot" class="status-badge online">ONLINE</span>
+      </div>
+    </header>
+
+    <!-- Main Scrollable Viewport -->
+    <main class="main-view" id="main-view">
+      <!-- TAB 1: BUDDIES -->
+      <section id="view-buddies" class="tab-page active">
+        <div class="user-card glass-panel">
+          <div class="user-row">
+            <img id="me-avatar" src="./avatars/aim_icon.gif" class="my-avatar" alt="Me" title="Change Avatar" />
+            <div class="user-meta">
+              <div class="user-nick-row">
+                <strong id="me-name">MobileUser_2006</strong>
+                <div style="display:flex;gap:4px;align-items:center">
+                  <select id="me-status" class="xp-select-sm">
+                    <option value="online">● Online</option>
+                    <option value="away">✎ Away</option>
+                    <option value="busy">⊘ Busy</option>
+                    <option value="invisible">◌ Invisible</option>
+                  </select>
+                  <button id="btn-away-edit" class="xp-btn sm gold" type="button">Away</button>
+                </div>
+              </div>
+              <input id="me-mood" class="xp-input-sm" type="text" placeholder="Mood note / ♪ Now Playing..." />
+            </div>
+          </div>
+          <div class="quick-add-row">
+            <input id="add-friend-input" class="xp-input" type="text" placeholder="Add Real Friend by Global Nick..." />
+            <button id="btn-add-friend" class="xp-btn primary" type="button">+ Friend</button>
+            <button id="btn-sync-peers" class="xp-btn" type="button">Sync</button>
+          </div>
+        </div>
+
+        <div id="buddies-container" class="list-stack" style="flex:1"></div>
+
+        <!-- Rotating PC Promo Banner -->
+        <div id="banner-slot-main" class="promo-banner-wrap"></div>
+      </section>
+
+      <!-- TAB 2: CHAT (1-ON-1 IM) -->
+      <section id="view-chat" class="tab-page">
+        <div class="chat-header glass-panel">
+          <button id="btn-back-buddies" class="xp-btn sm" type="button">←</button>
+          <div class="chat-peer-info">
+            <strong id="chat-peer-name">Argon_AI</strong>
+            <small id="chat-peer-sub">Gemini 4 Argon (Work)</small>
+          </div>
+          <button id="btn-peer-info" class="xp-btn sm" type="button" title="Buddy Profile">ℹ</button>
+          <button id="btn-buzz" class="xp-btn sm gold" type="button">Buzz!</button>
+          <button id="btn-translate-chat" class="xp-btn sm" type="button">EN↔RU</button>
+        </div>
+        <div id="chat-messages" class="chat-transcript"></div>
+        <div class="chat-toolbar">
+          <button class="emo-chip" data-emo=":-)" type="button">:-)</button>
+          <button class="emo-chip" data-emo=":-D" type="button">:-D</button>
+          <button class="emo-chip" data-emo=";-)" type="button">;-)</button>
+          <button class="emo-chip" data-emo="B-)" type="button">B-)</button>
+          <button class="emo-chip" data-emo="<3" type="button">&lt;3</button>
+          <span id="chat-model-badge" class="model-tag">Offline Smart</span>
+        </div>
+        <div class="chat-compose">
+          <input id="chat-input" class="xp-input" type="text" placeholder="Write message or /roll, /8ball..." />
+          <button id="btn-send-im" class="xp-btn primary" type="button">Send</button>
+        </div>
+        <div id="banner-slot-chat" class="promo-banner-wrap"></div>
+      </section>
+
+      <!-- TAB 3: PUBLIC GROUPS -->
+      <section id="view-public" class="tab-page">
+        <div id="public-hub-view">
+          <div class="glass-panel pad-sm">
+            <div class="row-between">
+              <strong id="lbl-pub-hub">Global Public Groups</strong>
+              <div>
+                <button id="btn-refresh-rooms" class="xp-btn sm" type="button">Sync</button>
+                <button id="btn-new-room" class="xp-btn sm primary" type="button">+ Create</button>
+              </div>
+            </div>
+            <input id="room-search" class="xp-input mt-6" type="text" placeholder="Search public rooms (#Global, #Aero, #AI)..." />
+          </div>
+          <div id="public-rooms-list" class="list-stack mt-8"></div>
+        </div>
+
+        <div id="public-room-view" class="hidden flex-col-full">
+          <div class="chat-header glass-panel">
+            <button id="btn-leave-room" class="xp-btn sm" type="button">← Hub</button>
+            <div class="chat-peer-info">
+              <strong id="room-active-name">#AIM_Lobby_2006</strong>
+              <small id="room-active-topic">World Public Hub</small>
+            </div>
+            <label class="tiny-chk"><input id="chk-room-ai" type="checkbox" checked /> AI</label>
+          </div>
+          <div id="room-messages" class="chat-transcript"></div>
+          <div class="chat-compose">
+            <input id="room-input" class="xp-input" type="text" placeholder="Message room or /roll, /8ball..." />
+            <button id="btn-send-room" class="xp-btn primary" type="button">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: AIM HUB (Music, Mail, Workshop, Support, Updates) -->
+      <section id="view-media" class="tab-page">
+        <div class="hub-pills glass-panel">
+          <button id="subtab-music" class="sub-pill active" type="button">♫ Music</button>
+          <button id="subtab-mail" class="sub-pill" type="button">✉ Mail (3)</button>
+          <button id="subtab-workshop" class="sub-pill" type="button">🎨 Workshop</button>
+          <button id="subtab-support" class="sub-pill" type="button">🛠 Support</button>
+          <button id="subtab-updates" class="sub-pill" type="button">🔄 Updates</button>
+        </div>
+
+        <!-- 4A. MUSIC PLAYER -->
+        <div id="pane-music">
+          <div class="oled-screen">
+            <div class="oled-top">
+              <span id="oled-state">READY</span>
+              <span id="oled-time">00:00</span>
+            </div>
+            <div id="oled-title" class="oled-title">Frutiger Aero Breeze</div>
+            <div id="oled-artist" class="oled-artist">Aqua Synth 2007</div>
+            <div class="eq-bars" id="eq-bars"></div>
+          </div>
+          <div class="glass-panel pad-sm mt-8">
+            <div class="transport-row">
+              <button id="btn-m-prev" class="xp-btn" type="button">|◄</button>
+              <button id="btn-m-play" class="xp-btn primary" type="button">▶ Play</button>
+              <button id="btn-m-stop" class="xp-btn" type="button">■ Stop</button>
+              <button id="btn-m-next" class="xp-btn" type="button">►|</button>
+              <label class="btn-file xp-btn gold">+ MP3<input id="file-add-audio" type="file" accept="audio/*" multiple hidden /></label>
+            </div>
+            <label class="chk-line mt-6"><input id="chk-share-music" type="checkbox" checked /> Share "♪ Now Playing" in my Status</label>
+          </div>
+          <div id="playlist-box" class="list-stack mt-8"></div>
+        </div>
+
+        <!-- 4B. AOL / AIM MAIL CENTER -->
+        <div id="pane-mail" class="hidden">
+          <div class="glass-panel pad-sm">
+            <div class="row-between">
+              <strong id="mail-banner-tag">You've Got Mail!</strong>
+              <div style="display:flex;gap:4px">
+                <button id="btn-check-mail" class="xp-btn sm" type="button">Sync</button>
+                <button id="btn-compose-mail" class="xp-btn sm primary" type="button">Write Mail</button>
+              </div>
+            </div>
+          </div>
+          <div id="mail-list" class="list-stack mt-8"></div>
+          <div id="mail-reader" class="glass-panel pad-sm mt-8 hidden">
+            <div class="row-between">
+              <strong id="mail-r-subj"></strong>
+              <div style="display:flex;gap:4px">
+                <button id="btn-mail-reply" class="xp-btn sm primary" type="button">Reply</button>
+                <button id="btn-mail-mark" class="xp-btn sm" type="button">Read/Unread</button>
+                <button id="btn-mail-del" class="xp-btn sm danger" type="button">Del</button>
+              </div>
+            </div>
+            <div class="muted mt-6"><span id="mail-r-from"></span> · <span id="mail-r-to"></span> · <span id="mail-r-date"></span></div>
+            <div id="mail-r-body" class="mail-body-text"></div>
+          </div>
+        </div>
+
+        <!-- 4C. AIM WORKSHOP (Skins, Creator Studio, Avatars & Sound Packs) -->
+        <div id="pane-workshop" class="hidden">
+          <div class="sub-tabs glass-panel">
+            <button id="ws-tab-skins" class="sub-pill active" type="button">Theme Skins</button>
+            <button id="ws-tab-studio" class="sub-pill" type="button">Studio</button>
+            <button id="ws-tab-packs" class="sub-pill" type="button">Avatars &amp; SFX</button>
+          </div>
+
+          <div id="ws-pane-skins" class="mt-8">
+            <div class="glass-panel pad-sm">
+              <label class="chk-line"><input id="chk-aero-bg" type="checkbox" checked /> Frutiger Aero Sky Wallpaper Backdrop</label>
+            </div>
+            <div id="ws-skin-gallery" class="skin-grid"></div>
+          </div>
+
+          <div id="ws-pane-studio" class="hidden mt-8">
+            <div class="glass-panel pad-sm">
+              <h3 class="sec-h" id="ws-studio-h">Theme Creator Studio</h3>
+              <div class="two-col">
+                <div>
+                  <label class="fld-lbl">Skin Name:</label>
+                  <input id="ws-st-name" class="xp-input" type="text" value="My Aqua Aero" />
+                </div>
+                <div>
+                  <label class="fld-lbl">Author:</label>
+                  <input id="ws-st-author" class="xp-input" type="text" value="User" />
+                </div>
+              </div>
+              <div class="two-col mt-6">
+                <label class="color-row"><span>Title Top</span><input id="ws-st-top" type="color" value="#2eceff" /></label>
+                <label class="color-row"><span>Title Bot</span><input id="ws-st-bot" type="color" value="#086cb2" /></label>
+                <label class="color-row"><span>Face Bg</span><input id="ws-st-face" type="color" value="#e4f6fd" /></label>
+                <label class="color-row"><span>Gold Accent</span><input id="ws-st-gold" type="color" value="#84ffc0" /></label>
+              </div>
+              <label class="chk-line mt-6"><input id="ws-st-glass" type="checkbox" checked /> Glossy Frutiger Aero Glass Shine</label>
+              <div id="ws-st-preview" class="mini-win-preview mt-8">
+                <div class="mini-win-bar" id="ws-prev-bar"><span>AIM Preview</span><span>✕</span></div>
+                <div class="mini-win-body" id="ws-prev-body">My Aqua Aero</div>
+              </div>
+              <div class="transport-row mt-8">
+                <button id="btn-ws-save" class="xp-btn primary" type="button">Save &amp; Apply</button>
+                <button id="btn-ws-export" class="xp-btn" type="button">Export .json</button>
+                <label class="btn-file xp-btn gold">Import .json<input id="file-ws-import" type="file" accept=".json" hidden /></label>
+              </div>
+            </div>
+          </div>
+
+          <div id="ws-pane-packs" class="hidden mt-8">
+            <div class="glass-panel pad-sm">
+              <div class="transport-row">
+                <label class="btn-file xp-btn primary">+ Custom Icon<input id="file-av-import" type="file" accept="image/*" hidden /></label>
+                <button id="btn-snd-welcome" class="xp-btn sm" type="button">▶ Welcome</button>
+                <button id="btn-snd-mail" class="xp-btn sm" type="button">▶ Mail</button>
+                <button id="btn-snd-ring" class="xp-btn sm" type="button">▶ Ring</button>
+                <button id="btn-snd-bye" class="xp-btn sm" type="button">▶ Bye</button>
+              </div>
+              <div id="ws-pack-status" class="muted mt-6">Tap any classic 2005-2008 AIM buddy icon or real WAV sound below:</div>
+            </div>
+            <div id="ws-avatar-grid" class="avatar-grid"></div>
+            <div class="glass-panel pad-sm mt-8">
+              <strong id="ws-sfx-hdr" class="sec-h" style="display:block;margin-bottom:6px">Classic AIM Sound Pack (19 Real WAVs)</strong>
+              <div id="ws-sound-grid" class="transport-row"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4D. AIM SUPPORT CENTER + AWAY & HISTORY -->
+        <div id="pane-support" class="hidden">
+          <div class="sub-tabs glass-panel">
+            <button id="sup-tab-diag" class="sub-pill active" type="button">Diagnostics</button>
+            <button id="sup-tab-guide" class="sub-pill" type="button">Friends Guide</button>
+            <button id="sup-tab-ticket" class="sub-pill" type="button">Ticket</button>
+          </div>
+
+          <div id="sup-pane-diag" class="glass-panel pad-sm mt-8">
+            <textarea id="sup-diag-text" class="diag-box" readonly></textarea>
+            <div class="transport-row mt-6">
+              <button id="btn-sup-refresh" class="xp-btn primary sm" type="button">Run Diagnostics</button>
+              <button id="btn-sup-sound" class="xp-btn sm" type="button">Test Sound</button>
+              <button id="btn-sup-copy" class="xp-btn sm" type="button">Copy</button>
+              <button id="btn-sup-save" class="xp-btn sm" type="button">Save .txt</button>
+            </div>
+            <div class="transport-row mt-6">
+              <button id="btn-open-away" class="xp-btn gold sm" type="button">Away Message Editor...</button>
+              <button id="btn-open-history" class="xp-btn sm" type="button">Chat History...</button>
+            </div>
+          </div>
+
+          <div id="sup-pane-guide" class="glass-panel pad-sm mt-8 hidden">
+            <textarea id="sup-guide-text" class="diag-box" style="height:250px;font-family:Tahoma,sans-serif" readonly></textarea>
+          </div>
+
+          <div id="sup-pane-ticket" class="glass-panel pad-sm mt-8 hidden">
+            <label class="fld-lbl">Category:</label>
+            <select id="sup-t-cat" class="xp-input">
+              <option>Real Friends / Global Cloud</option>
+              <option>API Keys &amp; AI Bots</option>
+              <option>Updates &amp; Android APK</option>
+              <option>Translation / UI / Themes</option>
+              <option>Other Feedback</option>
+            </select>
+            <label class="fld-lbl">Subject:</label>
+            <input id="sup-t-subj" class="xp-input" type="text" placeholder="Short summary..." />
+            <label class="fld-lbl">Description:</label>
+            <textarea id="sup-t-body" class="xp-input" rows="4" placeholder="Describe your question or issue..."></textarea>
+            <button id="btn-sup-ticket" class="xp-btn primary full mt-8" type="button">Create Support Ticket (.txt)</button>
+          </div>
+        </div>
+
+        <!-- 4E. AIM UPDATE CENTER -->
+        <div id="pane-updates" class="hidden">
+          <div class="glass-panel pad-sm">
+            <strong id="upd-cur-lbl" style="color:var(--navy)">Installed: AIM Classic v6.0.4020 (Mobile + APK)</strong>
+            <div class="two-col mt-6">
+              <div>
+                <label class="fld-lbl">Channel:</label>
+                <select id="upd-channel" class="xp-input">
+                  <option value="Stable (v6.0)">Stable (v6.0)</option>
+                  <option value="Stable (v5.9)">Stable (v5.9)</option>
+                  <option value="Beta Preview">Beta Preview</option>
+                  <option value="Custom Manifest URL">Custom Manifest URL</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:flex-end">
+                <label class="chk-line"><input id="upd-chk-auto" type="checkbox" checked /> Auto-check on start</label>
+              </div>
+            </div>
+            <label class="fld-lbl">Manifest JSON URL (optional):</label>
+            <input id="upd-manifest-url" class="xp-input" type="text" placeholder='{"version":"6.1.0","notes":"...","url":"..."}' />
+            <div class="row-between mt-8">
+              <small id="upd-status" style="font-weight:700;color:var(--navy)">Ready to check for updates.</small>
+              <button id="btn-upd-check" class="xp-btn primary sm" type="button">Check Updates</button>
+            </div>
+            <div class="xp-prog-track"><div id="upd-prog-bar" class="xp-prog-fill"></div></div>
+            <textarea id="upd-notes" class="diag-box mt-8" style="height:175px" readonly></textarea>
+            <button id="btn-upd-download" class="xp-btn gold full mt-6 hidden" type="button">Open Update Link</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: SETTINGS & AI API KEYS -->
+      <section id="view-settings" class="tab-page">
+        <div class="glass-panel pad-sm">
+          <h3 class="sec-h" id="sec-profile">Profile, Banners &amp; Language</h3>
+          <label class="fld-lbl">Screen Name (Nickname):</label>
+          <input id="set-nick" class="xp-input" type="text" />
+          <label class="fld-lbl">Global Room Code (syncs with PC):</label>
+          <input id="set-room" class="xp-input" type="text" />
+          <div class="two-col mt-6">
+            <div>
+              <label class="fld-lbl">Language / Язык:</label>
+              <select id="set-lang" class="xp-input">
+                <option value="en">English</option>
+                <option value="ru">Русский</option>
+              </select>
+            </div>
+            <div>
+              <label class="fld-lbl">Theme Skin:</label>
+              <select id="set-theme" class="xp-input">
+                <option value="aero">Frutiger Aero (2007 Glass)</option>
+                <option value="luna">XP Luna Blue (2005)</option>
+                <option value="royale">XP Royale Energy</option>
+                <option value="ice">AIM 6.0 Triton Ice</option>
+                <option value="silver">Windows XP Silver</option>
+                <option value="olive">XP Homestead Olive</option>
+                <option value="neon">Y2K Cyber Neon</option>
+              </select>
+            </div>
+          </div>
+          <div class="two-col mt-6">
+            <label class="chk-line"><input id="chk-show-banners" type="checkbox" checked /> Show Promo Banners</label>
+            <label class="chk-line"><input id="chk-mute-sound" type="checkbox" /> Mute AIM Sounds</label>
+          </div>
+        </div>
+
+        <div class="glass-panel pad-sm mt-8">
+          <h3 class="sec-h" id="sec-ai">API Keys for AI Bots (LLM)</h3>
+          <label class="fld-lbl">Active AI Model (Argon, Hydrogen, Astra, Claude, DeepSeek...):</label>
+          <select id="set-ai-model" class="xp-input"></select>
+          <label class="fld-lbl">API Profile / Provider:</label>
+          <select id="set-ai-provider" class="xp-input">
+            <option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions">Google Gemini (Argon / Hydrogen)</option>
+            <option value="https://api.openai.com/v1/chat/completions">OpenAI ChatGPT (Astra / GPT-6)</option>
+            <option value="https://openrouter.ai/api/v1/chat/completions">OpenRouter (All Models 1 Key)</option>
+            <option value="https://api.deepseek.com/chat/completions">DeepSeek (V4 / Reasoner)</option>
+            <option value="https://api.x.ai/v1/chat/completions">xAI Grok (Grok 4)</option>
+            <option value="https://api.groq.com/openai/v1/chat/completions">Groq Cloud (Fast)</option>
+            <option value="http://127.0.0.1:11434/v1/chat/completions">Local Ollama (PC / Termux)</option>
+          </select>
+          <label class="fld-lbl">Endpoint URL:</label>
+          <input id="set-ai-endpoint" class="xp-input" type="text" />
+          <label class="fld-lbl">API Key (leave empty = built-in offline AI bot):</label>
+          <div style="display:flex;gap:5px">
+            <input id="set-ai-key" class="xp-input" type="password" placeholder="Paste sk-... / AIza... or leave blank" />
+            <button id="btn-test-api" class="xp-btn sm" type="button">Test</button>
+          </div>
+          <label class="chk-line mt-6"><input id="chk-show-key" type="checkbox" /> Show API Key</label>
+          <div id="api-test-status" class="muted mt-6"></div>
+          <div class="transport-row mt-8">
+            <button id="btn-save-settings" class="xp-btn primary" style="flex:1" type="button">Save &amp; Sync Now</button>
+            <button id="btn-open-history2" class="xp-btn" type="button">History</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Tab Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-tab="buddies" type="button"><span>👥</span><small id="nav-buddies">Buddies</small></button>
+      <button class="nav-btn" data-tab="chat" type="button"><span>💬</span><small id="nav-chat">IM</small></button>
+      <button class="nav-btn" data-tab="public" type="button"><span>🌐</span><small id="nav-public">Public</small></button>
+      <button class="nav-btn" data-tab="media" type="button"><span>✨</span><small id="nav-media">AIM Hub</small></button>
+      <button class="nav-btn" data-tab="settings" type="button"><span>⚙️</span><small id="nav-settings">Setup</small></button>
+    </nav>
+  </div>
+
+  <!-- Create Room / Compose / Away / History / Profile Modal -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="xp-dialog">
+      <div class="xp-titlebar compact">
+        <span id="modal-title" class="tb-title">Dialog</span>
+        <button id="modal-x" class="promo-ctrl-btn" type="button">✕</button>
+      </div>
+      <div id="modal-body" class="pad-sm"></div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

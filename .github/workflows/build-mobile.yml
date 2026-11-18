@@ -1,0 +1,96 @@
+name: Build AIM Classic Mobile (Android APK & Apple iOS IPA)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "mobile_native/**"
+      - ".github/workflows/build-mobile.yml"
+
+jobs:
+  build_android_apk:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: Bootstrap Flutter Android Runner & Overlay Source
+        working-directory: mobile_native
+        run: |
+          mkdir -p /tmp/overlay
+          cp -r lib pubspec.yaml /tmp/overlay/
+          cp -r android/app/src/main/res android/app/src/main/AndroidManifest.xml android/app/src/main/kotlin /tmp/overlay/
+          flutter create --org com.aimclassic --project-name aim_classic_mobile --platforms=android .
+          rm -rf lib android/app/src/main/kotlin android/app/src/main/res/mipmap-*
+          cp -r /tmp/overlay/lib /tmp/overlay/pubspec.yaml .
+          cp -r /tmp/overlay/res /tmp/overlay/AndroidManifest.xml /tmp/overlay/kotlin android/app/src/main/
+          if [ -f android/app/build.gradle ]; then
+            sed -i 's/applicationId = ".*"/applicationId = "com.aimclassic.mobile"/' android/app/build.gradle || true
+            sed -i 's/namespace = ".*"/namespace = "com.aimclassic.mobile"/' android/app/build.gradle || true
+          fi
+          if [ -f android/app/build.gradle.kts ]; then
+            sed -i 's/applicationId = ".*"/applicationId = "com.aimclassic.mobile"/' android/app/build.gradle.kts || true
+            sed -i 's/namespace = ".*"/namespace = "com.aimclassic.mobile"/' android/app/build.gradle.kts || true
+          fi
+
+      - name: Fetch Dependencies & Build Release APK
+        working-directory: mobile_native
+        run: |
+          flutter pub get
+          flutter build apk --release
+
+      - name: Upload Android APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIMClassicMobile-Android-APK
+          path: mobile_native/build/app/outputs/flutter-apk/app-release.apk
+
+  build_ios_ipa:
+    name: Build Apple iOS IPA (Unsigned)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: Bootstrap Flutter iOS Runner & Overlay Source
+        working-directory: mobile_native
+        run: |
+          mkdir -p /tmp/overlay
+          cp -r lib pubspec.yaml /tmp/overlay/
+          cp -r ios/Runner/Info.plist ios/Runner/Assets.xcassets /tmp/overlay/
+          flutter create --org com.aimclassic --project-name aim_classic_mobile --platforms=ios .
+          rm -rf lib ios/Runner/Assets.xcassets
+          cp -r /tmp/overlay/lib /tmp/overlay/pubspec.yaml .
+          cp -r /tmp/overlay/Info.plist /tmp/overlay/Assets.xcassets ios/Runner/
+
+      - name: Build Unsigned iOS IPA
+        working-directory: mobile_native
+        run: |
+          flutter pub get
+          flutter build ios --release --no-codesign
+          mkdir -p build/ipa/Payload
+          cp -r build/ios/iphoneos/Runner.app build/ipa/Payload/
+          cd build/ipa && zip -r AIMClassicMobile-unsigned.ipa Payload
+
+      - name: Upload Apple iOS IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIMClassicMobile-iOS-IPA
+          path: mobile_native/build/ipa/AIMClassicMobile-unsigned.ipa
